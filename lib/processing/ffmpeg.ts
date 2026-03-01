@@ -1,13 +1,26 @@
 import ffmpeg from 'fluent-ffmpeg'
-import pathToFfmpeg from 'ffmpeg-static'
 import { tmpdir } from 'os'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { writeFile, readFile, unlink } from 'fs/promises'
 import { randomUUID } from 'crypto'
 
-if (pathToFfmpeg) {
-  ffmpeg.setFfmpegPath(pathToFfmpeg)
+// Resolve ffmpeg binary path dynamically at runtime
+function getFfmpegPath(): string {
+  try {
+    // ffmpeg-static exports the absolute path to the binary
+    // require at runtime so the path resolves on the actual host
+    const p = require('ffmpeg-static') as string
+    return p
+  } catch {
+    // Fallback: look relative to node_modules
+    const { createRequire } = require('module')
+    const req = createRequire(__filename)
+    const indexPath = req.resolve('ffmpeg-static')
+    return join(dirname(indexPath), 'ffmpeg')
+  }
 }
+
+ffmpeg.setFfmpegPath(getFfmpegPath())
 
 /**
  * Downloads a URL to a temporary file. Returns the file path.
