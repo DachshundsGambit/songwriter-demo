@@ -7,7 +7,7 @@ import { runReplicate, saveToBlobFromUrl } from '../replicate-client'
  */
 export async function stemSeparation(inputUrl: string): Promise<StepResult> {
   const output = await runReplicate(
-    'cjwbw/demucs:25a173108cff36ef9f80f854c162d01df9e6528be175794b81571f6c6c65ee1d',
+    'cjwbw/demucs',
     {
       audio: inputUrl,
       model: 'htdemucs_ft',
