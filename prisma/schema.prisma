@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  projects     Project[]
+}
+
+enum Tier {
+  FREE
+  PREMIUM
+}
+
+enum ProjectStatus {
+  UPLOADING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  userId      String
+  title       String
+  tier        Tier          @default(FREE)
+  status      ProjectStatus @default(UPLOADING)
+  originalUrl String?
+  finalUrl    String?
+  duration    Float?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  steps ProcessingStep[]
+  tracks Track[]
+
+  @@index([userId])
+}
+
+enum StepStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model ProcessingStep {
+  id         String     @id @default(cuid())
+  projectId  String
+  stepName   String
+  stepOrder  Int
+  status     StepStatus @default(PENDING)
+  provider   String?
+  externalId String?
+  inputUrl   String?
+  outputUrl  String?
+  errorMsg   String?
+  costCents  Int?
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, stepName])
+  @@index([externalId])
+}
+
+model Track {
+  id        String   @id @default(cuid())
+  projectId String
+  label     String
+  blobUrl   String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
