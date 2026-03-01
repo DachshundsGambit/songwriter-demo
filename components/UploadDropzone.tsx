@@ -18,8 +18,10 @@ export function UploadDropzone({ onUploaded }: UploadDropzoneProps) {
     setUploading(true)
     setProgress(0)
 
-    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/x-wav', 'audio/wave', 'audio/mp4', 'audio/x-m4a', 'audio/aac']
-    if (!validTypes.includes(file.type)) {
+    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/x-wav', 'audio/wave', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/m4a']
+    const validExts = ['.mp3', '.wav', '.m4a']
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    if (!validTypes.includes(file.type) && !validExts.includes(ext)) {
       setError('Invalid file type. Only MP3, WAV, and M4A files are accepted.')
       setUploading(false)
       return
