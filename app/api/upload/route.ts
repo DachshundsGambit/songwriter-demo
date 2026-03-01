@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { put } from '@vercel/blob'
 import { requireAuth } from '@/lib/auth'
 
-const ALLOWED_TYPES = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/x-wav', 'audio/wave']
+const ALLOWED_TYPES = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/x-wav', 'audio/wave', 'audio/mp4', 'audio/x-m4a', 'audio/aac']
 const MAX_SIZE = 50 * 1024 * 1024 // 50MB
 
 export async function POST(req: NextRequest) {
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Only MP3 and WAV are accepted.' }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid file type. Only MP3, WAV, and M4A are accepted.' }, { status: 400 })
     }
 
     if (file.size > MAX_SIZE) {

@@ -18,9 +18,9 @@ export function UploadDropzone({ onUploaded }: UploadDropzoneProps) {
     setUploading(true)
     setProgress(0)
 
-    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/x-wav', 'audio/wave']
+    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/x-wav', 'audio/wave', 'audio/mp4', 'audio/x-m4a', 'audio/aac']
     if (!validTypes.includes(file.type)) {
-      setError('Invalid file type. Only MP3 and WAV files are accepted.')
+      setError('Invalid file type. Only MP3, WAV, and M4A files are accepted.')
       setUploading(false)
       return
     }
@@ -86,12 +86,12 @@ export function UploadDropzone({ onUploaded }: UploadDropzoneProps) {
         <div>
           <div className="text-4xl mb-3 opacity-50">&#127925;</div>
           <p className="text-lg font-medium mb-1">Drop your recording here</p>
-          <p className="text-sm text-muted mb-4">MP3 or WAV, up to 50MB</p>
+          <p className="text-sm text-muted mb-4">MP3, WAV, or M4A, up to 50MB</p>
           <label className="inline-block px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-sm font-medium cursor-pointer transition-colors">
             Browse Files
             <input
               type="file"
-              accept=".mp3,.wav,audio/mpeg,audio/wav"
+              accept=".mp3,.wav,.m4a,audio/mpeg,audio/wav,audio/mp4,audio/x-m4a"
               onChange={handleChange}
               className="hidden"
             />
