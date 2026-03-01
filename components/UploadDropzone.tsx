@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import axios from 'axios'
 import api from '@/lib/api/client'
 
 interface UploadDropzoneProps {
@@ -45,8 +46,9 @@ export function UploadDropzone({ onUploaded }: UploadDropzoneProps) {
       })
 
       onUploaded(res.data.url, file.name)
-    } catch {
-      setError('Upload failed. Please try again.')
+    } catch (err: unknown) {
+      const msg = axios.isAxiosError(err) ? err.response?.data?.error : null
+      setError(msg || 'Upload failed. Please try again.')
     } finally {
       setUploading(false)
     }

@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
     if (!ALLOWED_TYPES.includes(file.type) && !ALLOWED_EXTS.includes(ext)) {
-      return NextResponse.json({ error: 'Invalid file type. Only MP3, WAV, and M4A are accepted.' }, { status: 400 })
+      return NextResponse.json({ error: `Invalid file type. Got type="${file.type}" ext="${ext}". Only MP3, WAV, and M4A are accepted.` }, { status: 400 })
     }
 
     if (file.size > MAX_SIZE) {
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     if ((err as Error).message === 'UNAUTHORIZED') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    console.error(err)
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    console.error('Upload error:', err)
+    return NextResponse.json({ error: `Upload failed: ${(err as Error).message}` }, { status: 500 })
   }
 }
