@@ -13,22 +13,38 @@ export async function stemSeparation(inputUrl: string): Promise<StepResult> {
       model: 'htdemucs_ft',
       stem: 'vocals',
     }
-  ) as { vocals: string; no_vocals: string } | string
+  )
 
-  // Demucs returns URLs for separated stems
-  let vocalsUrl: string
-  let instrumentsUrl: string
+  console.log('[demucs] raw output:', JSON.stringify(output, null, 2))
 
-  if (typeof output === 'object' && output !== null && 'vocals' in output) {
-    vocalsUrl = await saveToBlobFromUrl(output.vocals, 'vocals.wav')
-    instrumentsUrl = await saveToBlobFromUrl(output.no_vocals, 'instruments.wav')
-  } else if (typeof output === 'string') {
-    // Some versions return a single URL — treat as vocals-only
-    vocalsUrl = await saveToBlobFromUrl(output, 'vocals.wav')
-    instrumentsUrl = inputUrl // keep original as instruments fallback
-  } else {
-    throw new Error('Unexpected Demucs output format')
+  // Demucs returns an object with stem URLs. Fields may be FileOutput objects
+  // with a toString() or plain strings depending on SDK version.
+  const out = output as Record<string, unknown>
+
+  // Extract vocals URL - try 'vocals' key
+  const vocalsRaw = out?.vocals
+  const vocalsStr = typeof vocalsRaw === 'string'
+    ? vocalsRaw
+    : vocalsRaw && typeof (vocalsRaw as { toString(): string }).toString === 'function'
+      ? String(vocalsRaw)
+      : null
+
+  if (!vocalsStr) {
+    throw new Error(`Demucs: no vocals URL in output. Keys: ${Object.keys(out || {}).join(', ')}`)
   }
+
+  // Extract instruments - could be 'no_vocals', 'other', or we combine non-vocal stems
+  const noVocalsRaw = out?.no_vocals || out?.other
+  const noVocalsStr = typeof noVocalsRaw === 'string'
+    ? noVocalsRaw
+    : noVocalsRaw && typeof (noVocalsRaw as { toString(): string }).toString === 'function'
+      ? String(noVocalsRaw)
+      : null
+
+  const vocalsUrl = await saveToBlobFromUrl(vocalsStr, 'vocals.wav')
+  const instrumentsUrl = noVocalsStr
+    ? await saveToBlobFromUrl(noVocalsStr, 'instruments.wav')
+    : inputUrl // fallback to original if no instruments track
 
   return {
     outputUrl: vocalsUrl,

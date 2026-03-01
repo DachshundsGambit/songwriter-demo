@@ -12,9 +12,13 @@ export async function pitchCorrection(inputUrl: string): Promise<StepResult> {
       audio: inputUrl,
       correction_strength: 0.8,
     }
-  ) as string | { output: string }
+  )
 
-  const resultUrl = typeof output === 'string' ? output : output.output
+  console.log('[autotune] raw output:', JSON.stringify(output, null, 2))
+
+  const resultUrl = typeof output === 'string'
+    ? output
+    : String(output)
 
   const blobUrl = await saveToBlobFromUrl(resultUrl, 'vocals_corrected.wav')
 
