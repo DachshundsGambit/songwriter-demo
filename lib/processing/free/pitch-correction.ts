@@ -7,9 +7,9 @@ import { runReplicate, saveToBlobFromUrl } from '../replicate-client'
  */
 export async function pitchCorrection(inputUrl: string): Promise<StepResult> {
   const output = await runReplicate(
-    'nateraw/autotune',
+    'nateraw/autotune:53d58aea27ccd949e5f9d77e4b2a74ffe90e1fa534295b257cea50f011e233dd',
     {
-      audio: inputUrl,
+      audio_file: inputUrl,
       correction_strength: 0.8,
     }
   )
